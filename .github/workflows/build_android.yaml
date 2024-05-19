@@ -32,8 +32,14 @@ jobs:
     - name: Build Wasmer for Android
       run: |
         cargo install cargo-ndk
-        cargo ndk --target aarch64-linux-android --release build
-
+        cargo ndk -t arm64-v8a -o ./jniLibs build --release
+        
+    - name: Upload Artifact-1
+      uses: actions/upload-artifact@v3
+      with:
+        name: wasmer-android
+        path: ./jniLib
+        
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
