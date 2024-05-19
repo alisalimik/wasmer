@@ -2,39 +2,40 @@ name: Build Wasmer for Android
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
+
   build:
+    name: Build Wasmer for Android
     runs-on: ubuntu-latest
 
-    env:
-      TARGET: "aarch64-linux-android"
-      ANDROID_API_LEVEL: "21"
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up Rust
+    - uses: actions/checkout@v3
+    
+    - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        target: ${{ env.TARGET }}
-        override: true
+        target: aarch64-linux-android
 
-    - name: Install cargo ndk
-      run: cargo install cargo-ndk
+    - name: Install Android NDK
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y android-sdk
 
-    - name: Build Wasmer
-      run: cargo ndk build --target ${{ env.TARGET }} --release
-      
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
+    - name: Build Wasmer for Android
+      run: |
+        cargo install cargo-ndk
+        cargo ndk --target aarch64-linux-android --release build
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
       with:
         name: wasmer-android
-        path: target/${{ env.TARGET }}/release/wasmer
+        path: target/aarch64-linux-android/release/
